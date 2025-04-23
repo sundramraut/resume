@@ -91,11 +91,13 @@
   <div class="container">
     <h2>B.S. ↔ A.D. Date Converter</h2>
 
+    <!-- A.D. to B.S. -->
     <label for="ad">A.D. Date:</label>
     <input type="date" id="ad" />
     <button onclick="convertToBS()">Convert to B.S.</button>
     <p id="bsResult"></p>
 
+    <!-- B.S. to A.D. -->
     <label for="bs">B.S. Date (YYYY-MM-DD):</label>
     <input type="text" id="bs" placeholder="e.g., 2081-01-11" />
     <button onclick="convertToAD()">Convert to A.D.</button>
@@ -105,28 +107,44 @@
   </div>
 
   <script>
-    const bs = window.bs;
+    const bs = window.bs; // Get the Bikram Sambat JS object
 
+    // Function to convert A.D. to B.S.
     function convertToBS() {
       const adInput = document.getElementById("ad").value;
-      if (!adInput) return;
+      if (!adInput) {
+        document.getElementById("bsResult").textContent = "Please select a valid A.D. date.";
+        return;
+      }
 
       const [yyyy, mm, dd] = adInput.split('-').map(Number);
-      const converted = bs.toBs(yyyy, mm, dd);
+      const converted = bs.toBs(yyyy, mm, dd); // Convert using the Bikram Sambat library
 
-      document.getElementById("bsResult").textContent = 
-        `Equivalent B.S. Date: ${converted.bsYear}-${String(converted.bsMonth).padStart(2, '0')}-${String(converted.bsDate).padStart(2, '0')}`;
+      if (converted) {
+        document.getElementById("bsResult").textContent = 
+          `Equivalent B.S. Date: ${converted.bsYear}-${String(converted.bsMonth).padStart(2, '0')}-${String(converted.bsDate).padStart(2, '0')}`;
+      } else {
+        document.getElementById("bsResult").textContent = "Conversion failed. Please check the input.";
+      }
     }
 
+    // Function to convert B.S. to A.D.
     function convertToAD() {
       const bsInput = document.getElementById("bs").value;
-      if (!bsInput) return;
+      if (!bsInput) {
+        document.getElementById("adResult").textContent = "Please enter a valid B.S. date.";
+        return;
+      }
 
       const [yyyy, mm, dd] = bsInput.split('-').map(Number);
-      const converted = bs.toAd(yyyy, mm, dd);
+      const converted = bs.toAd(yyyy, mm, dd); // Convert using the Bikram Sambat library
 
-      document.getElementById("adResult").textContent = 
-        `Equivalent A.D. Date: ${converted.adYear}-${String(converted.adMonth).padStart(2, '0')}-${String(converted.adDate).padStart(2, '0')}`;
+      if (converted) {
+        document.getElementById("adResult").textContent = 
+          `Equivalent A.D. Date: ${converted.adYear}-${String(converted.adMonth).padStart(2, '0')}-${String(converted.adDate).padStart(2, '0')}`;
+      } else {
+        document.getElementById("adResult").textContent = "Conversion failed. Please check the input.";
+      }
     }
   </script>
 </body>
