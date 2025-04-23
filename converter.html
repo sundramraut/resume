@@ -39,25 +39,29 @@
   <p id="adResult"></p>
 
   <script>
-    // Simple conversion logic (approximate)
-    function convertToBS() {
-      const adDate = new Date(document.getElementById("ad").value);
-      const year = adDate.getFullYear() + 57;
-      const month = adDate.getMonth(); // 0-based
-      const day = adDate.getDate();
+  const bs = window.bs; // Accessing bikram-sambat-js from CDN
 
-      const bsDate = new Date(year, month, day + 9); // Approx offset
-      document.getElementById("bsResult").textContent = 
-        `Equivalent B.S. Date: ${bsDate.getFullYear()}-${String(bsDate.getMonth() + 1).padStart(2, '0')}-${String(bsDate.getDate()).padStart(2, '0')}`;
-    }
+  function convertToBS() {
+    const adInput = document.getElementById("ad").value;
+    if (!adInput) return;
 
-    function convertToAD() {
-      const bsInput = document.getElementById("bs").value;
-      const [bsYear, bsMonth, bsDay] = bsInput.split('-').map(Number);
-      const adDate = new Date(bsYear - 57, bsMonth - 1, bsDay - 9); // Approx offset
-      document.getElementById("adResult").textContent = 
-        `Equivalent A.D. Date: ${adDate.getFullYear()}-${String(adDate.getMonth() + 1).padStart(2, '0')}-${String(adDate.getDate()).padStart(2, '0')}`;
-    }
-  </script>
+    const [yyyy, mm, dd] = adInput.split('-').map(Number);
+    const converted = bs.toBs(yyyy, mm, dd);
+
+    document.getElementById("bsResult").textContent = 
+      `Equivalent B.S. Date: ${converted.bsYear}-${String(converted.bsMonth).padStart(2, '0')}-${String(converted.bsDate).padStart(2, '0')}`;
+  }
+
+  function convertToAD() {
+    const bsInput = document.getElementById("bs").value;
+    if (!bsInput) return;
+
+    const [yyyy, mm, dd] = bsInput.split('-').map(Number);
+    const converted = bs.toAd(yyyy, mm, dd);
+
+    document.getElementById("adResult").textContent = 
+      `Equivalent A.D. Date: ${converted.adYear}-${String(converted.adMonth).padStart(2, '0')}-${String(converted.adDate).padStart(2, '0')}`;
+  }
+    </script>
 </body>
 </html>
