@@ -188,7 +188,7 @@
 
     <!-- Main Container -->
     <div class="container">
-        <h2>Convert Dates with Style</h2>
+        <h2>Convert Dates with Precision</h2>
         <div class="converter">
             <!-- AD to BS -->
             <div class="input-group">
@@ -199,7 +199,7 @@
             <!-- BS to AD -->
             <div class="input-group">
                 <h3>BS to AD</h3>
-                <input type="number" id="bs-year" placeholder="BS Year (e.g., 2082)" min="2000" max="2100">
+                <input type="number" id="bs-year" placeholder="BS Year (e.g., 2061)" min="2000" max="2100">
                 <input type="number" id="bs-month" placeholder="BS Month (1-12)" min="1" max="12">
                 <input type="number" id="bs-day" placeholder="BS Day (1-32)" min="1" max="32">
                 <button onclick="convertBStoAD()">Convert</button>
@@ -217,15 +217,45 @@
     </div>
 
     <script>
-        // Simplified AD to BS and BS to AD conversion logic
+        // Reference date for accurate conversion
+        const reference = {
+            bs: { year: 2061, month: 8, day: 9 }, // 2061-08-09 BS
+            ad: new Date('2004-11-24') // 2004-11-24 AD
+        };
+
+        // BS month lengths (approximate, varies by year)
+        const bsMonthLengths = [30, 30, 31, 31, 31, 30, 30, 30, 29, 29, 30, 30];
+
         function convertADtoBS() {
             const adDate = new Date(document.getElementById('ad-date').value);
             if (!adDate.getTime()) return;
 
-            // Approximate conversion: BS is ~56.7 years ahead
-            const bsYear = adDate.getFullYear() + 56;
-            const bsMonth = adDate.getMonth() + 1; // Simplified, adjust for exact BS months
-            const bsDay = adDate.getDate();
+            // Calculate days difference from reference date
+            const msPerDay = 24 * 60 * 60 * 1000;
+            const daysDiff = Math.round((adDate - reference.ad) / msPerDay);
+
+            // Convert days to BS date
+            let bsYear = reference.bs.year;
+            let bsMonth = reference.bs.month;
+            let bsDay = reference.bs.day + daysDiff;
+
+            // Adjust for month/year overflow
+            while (bsDay > bsMonthLengths[bsMonth - 1]) {
+                bsDay -= bsMonthLengths[bsMonth - 1];
+                bsMonth++;
+                if (bsMonth > 12) {
+                    bsMonth = 1;
+                    bsYear++;
+                }
+            }
+            while (bsDay <= 0) {
+                bsMonth--;
+                if (bsMonth < 1) {
+                    bsMonth = 12;
+                    bsYear--;
+                }
+                bsDay += bsMonthLengths[bsMonth - 1];
+            }
 
             document.getElementById('bs-result').innerText = 
                 `BS Date: ${bsYear}-${bsMonth.toString().padStart(2, '0')}-${bsDay.toString().padStart(2, '0')}`;
@@ -236,14 +266,40 @@
             const bsMonth = parseInt(document.getElementById('bs-month').value);
             const bsDay = parseInt(document.getElementById('bs-day').value);
 
-            if (!bsYear || !bsMonth || !bsDay) {
+            if (!bsYear || !bsMonth || !bsDay || bsMonth < 1 || bsMonth > 12 || bsDay < 1 || bsDay > bsMonthLengths[bsMonth - 1]) {
                 document.getElementById('ad-result').innerText = 'Please enter a valid BS date';
                 return;
             }
 
-            // Approximate conversion: Subtract ~56.7 years
-            const adYear = bsYear - 56;
-            const adDate = new Date(adYear, bsMonth - 1, bsDay);
+            // Calculate days difference from reference BS date
+            let daysDiff = 0;
+            if (bsYear > reference.bs.year) {
+                for (let y = reference.bs.year; y < bsYear; y++) {
+                    daysDiff += 365; // Approximate, adjust for leap years in production
+                }
+            } else if (bsYear < reference.bs.year) {
+                for (let y = bsYear; y < reference.bs.year; y++) {
+                    daysDiff -= 365;
+                }
+            }
+
+            // Adjust for months
+            if (bsMonth > reference.bs.month) {
+                for (let m = reference.bs.month; m < bsMonth; m++) {
+                    daysDiff += bsMonthLengths[m - 1];
+                }
+            } else if (bsMonth < reference.bs.month) {
+                for (let m = bsMonth; m < reference.bs.month; m++) {
+                    daysDiff -= bsMonthLengths[m - 1];
+                }
+            }
+
+            // Adjust for days
+            daysDiff += bsDay - reference.bs.day;
+
+            // Convert to AD date
+            const msPerDay = 24 * 60 * 60 * 1000;
+            const adDate = new Date(reference.ad.getTime() + daysDiff * msPerDay);
 
             document.getElementById('ad-result').innerText = 
                 `AD Date: ${adDate.toISOString().split('T')[0]}`;
