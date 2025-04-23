@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nepali Calendar 2082 BS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .calendar-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .month {
+            background: #fff;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .month:hover {
+            transform: translateY(-5px);
+        }
+
+        .month h2 {
+            font-size: 1.5rem;
+            color: #ff6b6b;
+            margin-bottom: 10px;
+        }
+
+        .days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .dates {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+
+        .date {
+            padding: 10px;
+            border-radius: 50%;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .date:hover {
+            background: #ff6b6b;
+            color: #fff;
+        }
+
+        .today {
+            background: #4ecdc4;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .empty {
+            background: transparent;
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .month {
+                padding: 15px;
+            }
+
+            .month h2 {
+                font-size: 1.2rem;
+            }
+
+            .date {
+                padding: 8px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="calendar-container">
+        <h1>Nepali Calendar 2082 BS</h1>
+        <div class="calendar-grid" id="calendar"></div>
+    </div>
+
+    <script>
+        const months = [
+            { name: "Baisakh", days: 31 },
+            { name: "Jestha", days: 32 },
+            { name: "Asar", days: 31 },
+            { name: "Shrawan", days: 32 },
+            { name: "Bhadra", days: 31 },
+            { name: "Asoj", days: 30 },
+            { name: "Kartik", days: 30 },
+            { name: "Mangsir", days: 30 },
+            { name: "Poush", days: 29 },
+            { name: "Magh", days: 30 },
+            { name: "Falgun", days: 30 },
+            { name: "Chaitra", days: 30 }
+        ];
+
+        const calendarGrid = document.getElementById('calendar');
+
+        function generateCalendar() {
+            months.forEach(month => {
+                const monthDiv = document.createElement('div');
+                monthDiv.classList.add('month');
+
+                monthDiv.innerHTML = `
+                    <h2>${month.name}</h2>
+                    <div class="days">
+                        <div>Sun</div>
+                        <div>Mon</div>
+                        <div>Tue</div>
+                        <div>Wed</div>
+                        <div>Thu</div>
+                        <div>Fri</div>
+                        <div>Sat</div>
+                    </div>
+                    <div class="dates"></div>
+                `;
+
+                const datesDiv = monthDiv.querySelector('.dates');
+                // Add empty slots for alignment (assuming first day of month starts at Sunday)
+                for (let i = 0; i < Math.floor(Math.random() * 7); i++) {
+                    const emptyDiv = document.createElement('div');
+                    emptyDiv.classList.add('date', 'empty');
+                    datesDiv.appendChild(emptyDiv);
+                }
+
+                // Add dates
+                for (let day = 1; day <= month.days; day++) {
+                    const dateDiv = document.createElement('div');
+                    dateDiv.classList.add('date');
+                    dateDiv.textContent = day;
+                    // Highlight a random day as "today" for demo
+                    if (day === Math.floor(Math.random() * month.days) + 1) {
+                        dateDiv.classList.add('today');
+                    }
+                    datesDiv.appendChild(dateDiv);
+                }
+
+                calendarGrid.appendChild(monthDiv);
+            });
+        }
+
+        generateCalendar();
+    </script>
+</body>
+</html>
