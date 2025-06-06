@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Man on Horse</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .image-container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+        img {
+            border-radius: 8px;
+            width: 100%;
+            height: auto;
+            max-width: 500px; /* Limit max width for better display */
+            display: block;
+            margin: 0 auto 20px auto;
+        }
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #3b82f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="image-container">
+        <h1 class="text-2xl font-bold text-gray-800 mb-4">Man on Horse in Coat and Pant</h1>
+        <div id="image-display">
+            <div class="loading-spinner"></div>
+            <p class="text-gray-600 mt-2">Generating your image...</p>
+        </div>
+    </div>
+
+    <script type="module">
+        document.addEventListener('DOMContentLoaded', async () => {
+            const imageDisplay = document.getElementById('image-display');
+
+            // Function to generate the image using the API
+            async function generateImage() {
+                try {
+                    const prompt = "A man sitting on a horse wearing a stylish coat and pant, realistic, high detail, outdoor setting, clear lighting.";
+                    const payload = { instances: { prompt: prompt }, parameters: { "sampleCount": 1} };
+                    const apiKey = ""; // Canvas will automatically provide the API key
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`;
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const result = await response.json();
+
+                    if (result.predictions && result.predictions.length > 0 && result.predictions[0].bytesBase64Encoded) {
+                        const imageUrl = `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
+                        imageDisplay.innerHTML = `<img src="${imageUrl}" alt="Man on horse in coat and pant">`;
+                    } else {
+                        imageDisplay.innerHTML = `<p class="text-red-500">Failed to generate image. Please try again.</p>`;
+                        console.error("Image generation failed:", result);
+                    }
+                } catch (error) {
+                    imageDisplay.innerHTML = `<p class="text-red-500">An error occurred: ${error.message}</p>`;
+                    console.error("Error generating image:", error);
+                }
+            }
+
+            // Call the function to generate the image
+            generateImage();
+        });
+    </script>
+</body>
+</html>
